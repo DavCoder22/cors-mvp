@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Archivos de entorno
+.env
+
+# Logs
+*.log
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE
+.vscode/
+.idea/
+
+# Archivos de Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
