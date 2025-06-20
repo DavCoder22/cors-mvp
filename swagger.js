@@ -56,7 +56,12 @@ const options = {
       },
     ],
   },
-  apis: ['./routes/*.js', './app.js'], // Ruta a los archivos con anotaciones de Swagger
+  apis: [
+    './routes/*.js', 
+    './app.js',
+    './server.js',
+    './swagger.js'
+  ], // Ruta a los archivos con anotaciones de Swagger
 };
 
 const specs = swaggerJsdoc(options);
@@ -115,8 +120,35 @@ module.exports = { swaggerUi, specs };
  * /api/verificar-cors:
  *   options:
  *     summary: Verifica configuración CORS
- *     description: Endpoint para verificar la configuración CORS del servidor
+ *     description: |
+ *       ### Descripción Detallada
+ *       Este endpoint permite verificar la configuración CORS del servidor.
+ *       
+ *       ### Cómo Funciona
+ *       1. El navegador envía una petición OPTIONS (preflight)
+ *       2. El servidor responde con los encabezados CORS configurados
+ *       3. Si los encabezados son correctos, el navegador permite la petición real
+ *       
+ *       ### Uso Típico
+ *       ```javascript
+ *       // Ejemplo de verificación CORS con fetch
+ *       fetch('http://api.ejemplo.com/api/verificar-cors', {
+ *         method: 'OPTIONS',
+ *         headers: {
+ *           'Origin': 'http://tusitio.com',
+ *           'Access-Control-Request-Method': 'GET',
+ *           'Access-Control-Request-Headers': 'authorization'
+ *         }
+ *       });
+ *       ```
  *     tags: [CORS]
+ *     parameters:
+ *       - in: header
+ *         name: Origin
+ *         schema:
+ *           type: string
+ *         description: Origen de la petición (ej. http://tusitio.com)
+ *         required: true
  *     responses:
  *       200:
  *         description: CORS configurado correctamente
@@ -125,14 +157,32 @@ module.exports = { swaggerUi, specs };
  *             schema:
  *               type: string
  *               example: "*"
+ *             description: Orígenes permitidos (usar dominio específico en producción)
  *           Access-Control-Allow-Methods:
  *             schema:
  *               type: string
  *               example: "GET, POST, OPTIONS"
+ *             description: Métodos HTTP permitidos
  *           Access-Control-Allow-Headers:
  *             schema:
  *               type: string
  *               example: "Content-Type, Authorization"
+ *             description: Cabeceras permitidas en la petición
+ *           Access-Control-Max-Age:
+ *             schema:
+ *               type: integer
+ *               example: 86400
+ *             description: Tiempo en segundos que los resultados de la preflight pueden ser cacheados
+ *       403:
+ *         description: Acceso denegado por política CORS
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Origen no permitido"
  */
 
 /**
