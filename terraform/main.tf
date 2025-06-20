@@ -3,9 +3,20 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Obtener las zonas de disponibilidad
-data "aws_availability_zones" "available" {
-  state = "available"
+# Obtener la AMI más reciente de Ubuntu 20.04
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 }
 
 # Generar una clave SSH
@@ -14,24 +25,23 @@ resource "tls_private_key" "this" {
   rsa_bits  = 4096
 }
 
+# Guardar la clave privada localmente
+resource "local_file" "private_key" {
+  content  = tls_private_key.this.private_key_pem
+  filename = "${path.module}/cors-mvp-key.pem"
+  file_permission = "0400"
+}
+
 # Crear par de claves en AWS
 resource "aws_key_pair" "generated_key" {
   key_name   = "cors-mvp-key"
   public_key = tls_private_key.this.public_key_openssh
-
-  # Guardar la clave privada localmente
-  provisioner "local-exec" {
-    command = <<-EOT
-      echo '${tls_private_key.this.private_key_pem}' > ./cors-mvp-key.pem
-      chmod 400 ./cors-mvp-key.pem
-    EOT
-  }
 }
 
-# Grupo de seguridad para la instancia EC2
+# Grupo de seguridad
 resource "aws_security_group" "cors_mvp_sg" {
   name        = "cors-mvp-sg"
-  description = "Allow HTTP, HTTPS and SSH traffic"
+  description = "Allow HTTP, HTTPS, SSH and Node.js app"
 
   # SSH
   ingress {
@@ -49,7 +59,7 @@ resource "aws_security_group" "cors_mvp_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Puerto de la aplicación
+  # Aplicación Node.js
   ingress {
     from_port   = 3000
     to_port     = 3000
@@ -64,162 +74,70 @@ resource "aws_security_group" "cors_mvp_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
 
-# Configuración de red
-resource "aws_default_vpc" "default" {
   tags = {
-    Name = "Default VPC"
-  }
-}
-
-# Crear una subred pública
-resource "aws_default_subnet" "default_az1" {
-  availability_zone = data.aws_availability_zones.available.names[0]
-  
-  tags = {
-    Name = "Default subnet for ${data.aws_availability_zones.available.names[0]}"
+    Name = "cors-mvp-sg"
   }
 }
 
 # Instancia EC2
 resource "aws_instance" "cors_mvp" {
-  ami           = "ami-0c7217cdde317cfec"  # Amazon Linux 2
-  instance_type = "t2.micro"
-  key_name      = aws_key_pair.generated_key.key_name
-  
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t2.micro"
+  key_name               = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.cors_mvp_sg.id]
-  subnet_id              = aws_default_subnet.default_az1.id
-  associate_public_ip_address = true
   
   # Script de inicialización
   user_data = <<-EOF
               #!/bin/bash
               # Actualizar el sistema
-              yum update -y
-              
-              # Instalar Node.js
-              curl -sL https://rpm.nodesource.com/setup_16.x | bash -
-              yum install -y nodejs
-              
-              # Crear directorio de la aplicación
-              mkdir -p /home/ec2-user/cors-mvp
-              cd /home/ec2-user/cors-mvp
-              
-              # Crear package.json
-              cat > package.json << 'PACKAGE_JSON'
-              {
-                "name": "cors-mvp",
-                "version": "1.0.0",
-                "description": "Demo de CORS",
-                "main": "server.js",
-                "scripts": {
-                  "start": "node server.js"
-                },
-                "dependencies": {
-                  "cors": "^2.8.5",
-                  "express": "^4.18.2"
-                }
+              sudo apt update -y
+              sudo apt upgrade -y
+
+              # Instalar Node.js y npm
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt install -y nodejs
+
+              # Instalar Nginx
+              sudo apt install -y nginx
+
+              # Configurar Nginx
+              sudo tee /etc/nginx/sites-available/cors-mvp << 'NGINX'
+              server {
+                  listen 80;
+                  server_name _;
+
+                  location / {
+                      proxy_pass http://localhost:3000;
+                      proxy_http_version 1.1;
+                      proxy_set_header Upgrade \$http_upgrade;
+                      proxy_set_header Connection 'upgrade';
+                      proxy_set_header Host \$host;
+                      proxy_cache_bypass \$http_upgrade;
+                  }
               }
-              PACKAGE_JSON
-              
-              # Crear server.js
-              cat > server.js << 'SERVER_JS'
-              const express = require('express');
-              const path = require('path');
-              const cors = require('cors');
-              const app = express();
-              const port = 3000;
-              
-              // Configurar CORS
-              app.use(cors({
-                  origin: '*',
-                  methods: ['GET', 'OPTIONS'],
-                  allowedHeaders: ['Content-Type', 'Accept']
-              }));
-              
-              // Middleware para parsear JSON
-              app.use(express.json());
-              
-              // Servir archivos estáticos
-              app.use(express.static('.'));
-              
-              // Ruta de ejemplo para probar CORS
-              app.get('/api/saludo', (req, res) => {
-                  res.json({
-                      mensaje: '¡Hola CORS! La petición se realizó correctamente con CORS habilitado.'
-                  });
-              });
-              
-              // Ruta principal
-              app.get('/', (req, res) => {
-                  res.sendFile(path.join(__dirname, 'index.html'));
-              });
-              
-              // Iniciar el servidor
-              app.listen(port, '0.0.0.0', () => {
-                  console.log('Servidor corriendo en http://0.0.0.0:' + port);
-              });
-              SERVER_JS
-              
-              # Crear index.html
-              cat > index.html << 'HTML'
-              <!DOCTYPE html>
-              <html lang="es">
-              <head>
-                  <meta charset="UTF-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <title>MVP CORS</title>
-                  <style>
-                      body {
-                          font-family: Arial, sans-serif;
-                          max-width: 800px;
-                          margin: 0 auto;
-                          padding: 20px;
-                      }
-                      .container {
-                          text-align: center;
-                          margin-top: 50px;
-                      }
-                      button {
-                          padding: 10px 20px;
-                          font-size: 16px;
-                          cursor: pointer;
-                      }
-                      #resultado {
-                          margin-top: 20px;
-                          padding: 10px;
-                          border: 1px solid #ccc;
-                          border-radius: 5px;
-                          min-height: 50px;
-                      }
-                  </style>
-              </head>
-              <body>
-                  <div class="container">
-                      <h1>MVP CORS Demo</h1>
-                      <button id="saludar">Saludar al Servidor</button>
-                      <div id="resultado"></div>
-                  </div>
-                  <script>
-                      document.getElementById('saludar').addEventListener('click', async () => {
-                          const resultado = document.getElementById('resultado');
-                          try {
-                              const response = await fetch('/api/saludo');
-                              const data = await response.json();
-                              resultado.textContent = data.mensaje;
-                          } catch (error) {
-                              resultado.textContent = 'Error: ' + error.message;
-                          }
-                      });
-                  </script>
-              </body>
-              </html>
-              HTML
-              
-              # Instalar dependencias e iniciar la aplicación
+              NGINX
+
+              # Habilitar el sitio
+              sudo ln -sf /etc/nginx/sites-available/cors-mvp /etc/nginx/sites-enabled/
+              sudo nginx -t
+              sudo systemctl restart nginx
+
+              # Clonar el repositorio
+              cd /home/ubuntu
+              git clone https://github.com/DavCoder22/cors-mvp.git
+              cd cors-mvp
+
+              # Instalar dependencias
               npm install
-              nohup node server.js > app.log 2>&1 &
+
+              # Instalar PM2
+              sudo npm install -g pm2
+
+              # Iniciar la aplicación con PM2
+              pm2 start server.js --name "cors-mvp"
+              pm2 startup
+              pm2 save
               EOF
 
   tags = {
@@ -227,4 +145,7 @@ resource "aws_instance" "cors_mvp" {
   }
 }
 
-# Las salidas se han movido a outputs.tf
+# Mostrar la IP pública
+output "public_ip" {
+  value = aws_instance.cors_mvp.public_ip
+}

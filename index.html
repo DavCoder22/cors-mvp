@@ -8,10 +8,20 @@
 </head>
 <body>
     <div class="container">
-        <h1>Ejemplo MVP + CORS</h1>
+        <h1>MVP + CORS Demo</h1>
         <div class="card">
-            <button id="saludar">Saludar</button>
-            <div id="resultado" class="resultado"></div>
+            <button id="saludar">Probar API Local</button>
+            <button id="probarRemoto">Probar API Remota</button>
+            <div class="resultados">
+                <div class="resultado-container">
+                    <h3>Respuesta de la API:</h3>
+                    <div id="resultado" class="resultado">-</div>
+                </div>
+                <div class="resultado-container">
+                    <h3>Estado CORS:</h3>
+                    <div id="corsStatus" class="cors-status">No verificado</div>
+                </div>
+            </div>
             <div id="error" class="error oculto"></div>
         </div>
     </div>
