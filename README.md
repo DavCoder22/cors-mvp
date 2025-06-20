@@ -1,135 +1,149 @@
 # CORS MVP Demo
 
-Este proyecto es una aplicación de demostración que muestra el funcionamiento de CORS (Cross-Origin Resource Sharing) en aplicaciones web. La aplicación incluye tanto un cliente como un servidor para probar diferentes escenarios de solicitudes entre orígenes.
+This project is a demonstration application that showcases the functionality of CORS (Cross-Origin Resource Sharing) in web applications. The application includes both a client and a server to test different cross-origin request scenarios.
 
-## 🚀 Características
+## 🚀 Features
 
-- Interfaz de usuario intuitiva para probar solicitudes CORS
-- Servidor configurado con políticas CORS personalizables
-- Documentación detallada de la API
-- Despliegue en la nube con Terraform (opcional)
-- Documentación Swagger para la API
+- Intuitive user interface for testing CORS requests
+- Server configured with customizable CORS policies
+- Detailed API documentation
+- Cloud deployment with Terraform (optional)
+- Swagger API documentation
 
-## 📋 Requisitos Previos
+## 📋 Prerequisites
 
-- Node.js (versión 14 o superior)
-- npm (incluido con Node.js)
-- Navegador web moderno
-- (Opcional) Terraform para despliegue en la nube
+- Node.js (version 14 or higher)
+- npm (included with Node.js)
+- Modern web browser
+- (Optional) Terraform for cloud deployment
 
-## 🛠️ Instalación
+## 🛠️ Installation
 
-1. Clona el repositorio:
+1. Clone the repository:
+
    ```bash
-   git clone [URL_DEL_REPOSITORIO]
+   git clone [REPOSITORY_URL]
    cd cors-mvp
    ```
 
-2. Instala las dependencias:
+2. Install dependencies:
+
    ```bash
    npm install
    ```
 
-3. Inicia el servidor:
+3. Start the server:
+
    ```bash
    npm start
    ```
-   O para desarrollo con recarga automática:
+
+   Or for development with auto-reload:
+
    ```bash
    npm run dev
    ```
 
-4. Abre tu navegador y navega a:
-   ```
+4. Open your browser and navigate to:
+
+   ```text
    http://localhost:3000
    ```
 
-## 🏗️ Estructura del Proyecto
+## 🏗️ Project Structure
 
-```
+```text
 cors-mvp/
-├── app.js           # Lógica del cliente (MVP)
-├── server.js        # Configuración del servidor
-├── swagger.js       # Documentación de la API con Swagger
-├── index.html       # Interfaz de usuario
-├── style.css        # Estilos CSS
-├── terraform/       # Configuración de infraestructura
+├── app.js           # Client-side logic (MVP)
+├── server.js        # Server configuration
+├── swagger.js       # API documentation with Swagger
+├── index.html       # User interface
+├── style.css        # CSS styles
+├── terraform/       # Infrastructure configuration
 │   ├── main.tf
 │   ├── outputs.tf
 │   └── variables.tf
-└── package.json     # Dependencias y scripts
+└── package.json     # Dependencies and scripts
 ```
 
-## 🌐 Uso
+## 🌐 Usage
 
-1. **Prueba Local**:
-   - Haz clic en "Probar Llamada Local" para probar una llamada al mismo origen.
+1. **Local Test**:
 
-2. **Prueba Remota**:
-   - Haz clic en "Probar Llamada Remota" para probar una llamada entre orígenes.
-   - Observa cómo responde el servidor con los encabezados CORS apropiados.
+   - Click on "Test Local Call" to test a same-origin request.
 
-3. **Documentación de la API**:
-   - Accede a la documentación interactiva de la API en:
-     ```
+2. **Remote Test**:
+
+   - Click on "Test Remote Call" to test a cross-origin request.
+   - Observe how the server responds with the appropriate CORS headers.
+
+3. **API Documentation**:
+
+   - Access the interactive API documentation at:
+
+     ```text
      http://localhost:3000/api-docs
      ```
 
-## 🔧 Configuración CORS
+## 🔧 CORS Configuration
 
-El servidor está configurado con las siguientes opciones CORS:
+The server is configured with the following CORS options:
 
 ```javascript
 app.use(cors({
-  origin: '*', // Permite todos los orígenes (ajustar en producción)
+  origin: '*', // Allows all origins (adjust in production)
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 ```
 
-## 🚀 Despliegue con Terraform
+## 🚀 Deployment with Terraform
 
-Para desplegar la aplicación en la nube:
+To deploy the application to the cloud:
 
-1. Navega al directorio de Terraform:
+1. Navigate to the Terraform directory:
+
    ```bash
    cd terraform
    ```
 
-2. Inicializa Terraform:
+2. Initialize Terraform:
+
    ```bash
    terraform init
    ```
 
-3. Revisa los cambios planeados:
+3. Review the planned changes:
+
    ```bash
    terraform plan
    ```
 
-4. Aplica los cambios:
+4. Apply the changes:
+
    ```bash
    terraform apply
    ```
 
-## 📚 Documentación Adicional
+## 📚 Additional Documentation
 
-- [Documentación de Express](https://expressjs.com/)
-- [Documentación de CORS](https://github.com/expressjs/cors)
-- [Especificación CORS](https://developer.mozilla.org/es/docs/Web/HTTP/CORS)
-- [Documentación de Swagger](https://swagger.io/docs/)
+- [Express Documentation](https://expressjs.com/)
+- [CORS Documentation](https://github.com/expressjs/cors)
+- [CORS Specification](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+- [Swagger Documentation](https://swagger.io/docs/)
 
-## 🤝 Contribución
+## 🤝 Contributing
 
-Las contribuciones son bienvenidas. Por favor, lee nuestras pautas de contribución antes de enviar cambios.
+Contributions are welcome. Please read our contribution guidelines before submitting changes.
 
-## 📄 Licencia
+## 📄 License
 
-Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más información.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
 
-## ✉️ Contacto
+## ✉️ Contact
 
-Si tienes preguntas o comentarios, no dudes en abrir un issue en el repositorio.
+If you have any questions or comments, feel free to open an issue in the repository.
 
 ---
 
-Desarrollado con ❤️ por [Tu Nombre] | [2025]
+Built with ❤️ by [Your Name] | [2025]

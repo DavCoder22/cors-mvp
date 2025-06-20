@@ -149,8 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Agregar información de depuración
 console.log('Aplicación CORS MVP inicializada');
-console.log('Modo:', process.env.NODE_ENV || 'development');
-console.log('Tiempo de compilación:', new Date().toLocaleString());
+console.log('Modo:', window.location.hostname === 'localhost' ? 'development' : 'production');
+console.log('Tiempo de carga:', new Date().toLocaleString());
 
 // Manejar errores no capturados
 window.addEventListener('error', (event) => {

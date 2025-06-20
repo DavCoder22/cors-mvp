@@ -1,28 +1,28 @@
-// Opciones de configuración de Swagger/OpenAPI
+// Swagger/OpenAPI configuration options
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'CORS MVP API',
       version: '1.0.0',
-      description: 'API para demostración de configuración CORS. Este MVP incluye:\n' +
-        '\n- Frontend interactivo para probar CORS' +
-        '\n- Backend con Node.js/Express' +
-        '\n- Documentación con Swagger/OpenAPI' +
-        '\n- Despliegue en AWS con Terraform',
+      description: 'API for CORS configuration demonstration. This MVP includes:\n' +
+        '\n- Interactive frontend to test CORS' +
+        '\n- Backend with Node.js/Express' +
+        '\n- Documentation with Swagger/OpenAPI' +
+        '\n- AWS deployment with Terraform',
       contact: {
-        name: 'Soporte',
-        email: 'tu@email.com'
+        name: 'Support',
+        email: 'your@email.com'
       },
     },
     servers: [
       {
         url: 'http://localhost:3000',
-        description: 'Servidor de desarrollo'
+        description: 'Development server'
       },
       {
-        url: 'http://3.91.1.153:3000',
-        description: 'Servidor de producción'
+        url: 'http://34.227.72.22:3000',
+        description: 'Production server'
       }
     ],
     components: {
@@ -35,7 +35,7 @@ const options = {
       },
       responses: {
         UnauthorizedError: {
-          description: 'Acceso no autorizado',
+          description: 'Unauthorized access',
           content: {
             'application/json': {
               schema: {
@@ -43,7 +43,7 @@ const options = {
                 properties: {
                   message: {
                     type: 'string',
-                    example: 'No autorizado',
+                    example: 'Unauthorized',
                   },
                 },
               },
@@ -160,9 +160,9 @@ module.exports = options;
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Iniciar sesión
- *     description: Autentica un usuario y devuelve un token JWT
- *     tags: [Autenticación]
+ *     summary: User login
+ *     description: Authenticates a user and returns a JWT token
+ *     tags: [Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -175,14 +175,14 @@ module.exports = options;
  *             properties:
  *               username:
  *                 type: string
- *                 example: usuario@ejemplo.com
+ *                 example: admin
  *               password:
  *                 type: string
  *                 format: password
- *                 example: contraseña123
+ *                 example: admin123
  *     responses:
  *       200:
- *         description: Autenticación exitosa
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
@@ -190,30 +190,24 @@ module.exports = options;
  *               properties:
  *                 token:
  *                   type: string
- *                   description: Token JWT para autenticación
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     email:
- *                       type: string
+ *                   description: JWT token for authentication
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: Credenciales inválidas
+ *         description: Invalid credentials
  *       500:
- *         $ref: '#/components/responses/ServerError'
+ *         description: Server error
  */
 
 /**
  * @swagger
  * /api/health:
  *   get:
- *     summary: Verificar estado del servicio
- *     description: Verifica que el servicio esté en funcionamiento
- *     tags: [Sistema]
+ *     summary: Check service status
+ *     description: Checks that the service is running
+ *     tags: [System]
  *     responses:
  *       200:
- *         description: Servicio en funcionamiento
+ *         description: Service running
  *         content:
  *           application/json:
  *             schema:
@@ -235,30 +229,30 @@ module.exports = options;
 /**
  * @swagger
  * tags:
- *   name: Autenticación
- *   description: Endpoints para autenticación de usuarios
+ *   name: Authentication
+ *   description: Endpoints for user authentication
  * 
  * @swagger
  * tags:
- *   name: Usuarios
- *   description: Gestión de usuarios
+ *   name: Users
+ *   description: User management
  * 
  * @swagger
  * tags:
  *   name: CORS
- *   description: Endpoints para pruebas de CORS
+ *   description: Endpoints for CORS testing
  */
 
 /**
  * @swagger
  * /api/saludo:
  *   get:
- *     summary: Obtiene un saludo
- *     description: Retorna un mensaje de saludo para probar la API
+ *     summary: Gets a greeting
+ *     description: Returns a greeting message to test the API
  *     tags: [CORS]
  *     responses:
  *       200:
- *         description: Saludo obtenido correctamente
+ *         description: Greeting obtained correctly
  *         content:
  *           application/json:
  *             schema:
@@ -266,9 +260,9 @@ module.exports = options;
  *               properties:
  *                 mensaje:
  *                   type: string
- *                   example: Hola Mundo
+ *                   example: Hello World
  *       500:
- *         description: Error del servidor
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
@@ -282,55 +276,32 @@ module.exports = options;
  * @swagger
  * /api/verificar-cors:
  *   options:
- *     summary: Verifica configuración CORS
- *     description: |
- *       ### Descripción Detallada
- *       Este endpoint permite verificar la configuración CORS del servidor.
- *       
- *       ### Cómo Funciona
- *       1. El navegador envía una petición OPTIONS (preflight)
- *       2. El servidor responde con los encabezados CORS configurados
- *       3. Si los encabezados son correctos, el navegador permite la petición real
- *       
- *       ### Uso Típico
- *       ```javascript
- *       // Ejemplo de verificación CORS con fetch
- *       fetch('http://api.ejemplo.com/api/verificar-cors', {
- *         method: 'OPTIONS',
- *         headers: {
- *           'Origin': 'http://tusitio.com',
- *           'Access-Control-Request-Method': 'GET',
- *           'Access-Control-Request-Headers': 'authorization'
- *         }
- *       });
- *       ```
+ *     summary: Verify CORS configuration
+ *     description: Endpoint to verify server CORS configuration
  *     tags: [CORS]
  *     parameters:
  *       - in: header
  *         name: Origin
  *         schema:
  *           type: string
- *         description: Origen de la petición (ej. http://tusitio.com)
+ *         description: Origin of the request (e.g. http://your-site.com)
  *         required: true
  *     responses:
  *       200:
- *         description: CORS configurado correctamente
+ *         description: CORS configured successfully
  *         headers:
  *           Access-Control-Allow-Origin:
  *             schema:
  *               type: string
  *               example: "*"
- *             description: Orígenes permitidos (usar dominio específico en producción)
  *           Access-Control-Allow-Methods:
  *             schema:
  *               type: string
  *               example: "GET, POST, OPTIONS"
- *             description: Métodos HTTP permitidos
  *           Access-Control-Allow-Headers:
  *             schema:
  *               type: string
  *               example: "Content-Type, Authorization"
- *             description: Cabeceras permitidas en la petición
  *           Access-Control-Max-Age:
  *             schema:
  *               type: integer
@@ -345,16 +316,16 @@ module.exports = options;
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Origen no permitido"
+ *                   example: "Origin not allowed"
  */
 
 /**
  * @swagger
- * /api/usuarios:
+ * /api/users:
  *   get:
- *     summary: Obtiene lista de usuarios
- *     description: Retorna una lista de usuarios (ejemplo)
- *     tags: [Usuarios]
+ *     summary: Get list of users
+ *     description: Returns all registered users in the system
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
