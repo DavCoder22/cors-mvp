@@ -66,7 +66,170 @@ const options = {
   ], // Ruta a los archivos con anotaciones de Swagger
 };
 
+// Exportar la configuración de Swagger
 module.exports = options;
+
+/**
+ * Ejemplo de documentación de un endpoint
+ * 
+ * @swagger
+ * /api/ejemplo:
+ *   get:
+ *     summary: Obtiene un recurso de ejemplo
+ *     description: |
+ *       Este es un endpoint de ejemplo que muestra cómo documentar diferentes aspectos
+ *       de un endpoint RESTful, incluyendo parámetros, respuestas y ejemplos.
+ *     tags: [Ejemplos]
+ *     parameters:
+ *       - $ref: '#/components/parameters/limitParam'
+ *       - $ref: '#/components/parameters/offsetParam'
+ *       - in: header
+ *         name: X-Request-ID
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: ID único de la solicitud
+ *     responses:
+ *       200:
+ *         description: Lista de recursos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Saludo'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                       example: 100
+ *                     limit:
+ *                       type: integer
+ *                       example: 10
+ *                     offset:
+ *                       type: integer
+ *                       example: 0
+ *       400:
+ *         $ref: '#/components/responses/BadRequest'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ *     security:
+ *       - bearerAuth: []
+ *     deprecated: false
+ *     externalDocs:
+ *       description: Más información
+ *       url: https://ejemplo.com/docs/ejemplo
+ */
+
+/**
+ * @swagger
+ * /api/ejemplo/{id}:
+ *   get:
+ *     summary: Obtiene un recurso específico
+ *     description: Obtiene los detalles de un recurso específico por su ID
+ *     tags: [Ejemplos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del recurso
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Recurso encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Saludo'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *     security:
+ *       - bearerAuth: []
+ */
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Iniciar sesión
+ *     description: Autentica un usuario y devuelve un token JWT
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: usuario@ejemplo.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: contraseña123
+ *     responses:
+ *       200:
+ *         description: Autenticación exitosa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT para autenticación
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       400:
+ *         description: Credenciales inválidas
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ */
+
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Verificar estado del servicio
+ *     description: Verifica que el servicio esté en funcionamiento
+ *     tags: [Sistema]
+ *     responses:
+ *       200:
+ *         description: Servicio en funcionamiento
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: '2025-06-20T02:39:06.000Z'
+ *                 version:
+ *                   type: string
+ *                   example: 1.0.0
+ */
 
 // Documentación de la API
 /**
