@@ -5,7 +5,11 @@ const options = {
     info: {
       title: 'CORS MVP API',
       version: '1.0.0',
-      description: 'API para demostración de configuración CORS',
+      description: 'API para demostración de configuración CORS. Este MVP incluye:\n' +
+        '\n- Frontend interactivo para probar CORS' +
+        '\n- Backend con Node.js/Express' +
+        '\n- Documentación con Swagger/OpenAPI' +
+        '\n- Despliegue en AWS con Terraform',
       contact: {
         name: 'Soporte',
         email: 'tu@email.com'
