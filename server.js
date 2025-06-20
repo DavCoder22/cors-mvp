@@ -1,9 +1,13 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { swaggerUi, specs } = require('./swagger');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 const app = express();
 const port = 3000;
+
+// Importar opciones de Swagger
+const swaggerOptions = require('./swagger');
 
 // Configurar CORS
 app.use(cors({
@@ -18,17 +22,29 @@ app.use(express.json());
 // Servir archivos estáticos desde el directorio actual
 app.use(express.static('.'));
 
+// Configurar Swagger
+const specs = swaggerJsdoc(swaggerOptions);
+
 // Configurar Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+const swaggerUiOptions = {
   explorer: true,
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Documentación API CORS MVP'
-}));
+};
 
-// Ruta para obtener la documentación JSON
+// Ruta para la interfaz de Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
+
+// Ruta para obtener la especificación OpenAPI en formato JSON
 app.get('/api-docs.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(specs);
+});
+
+// Middleware de registro para depuración
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
 });
 
 /**
